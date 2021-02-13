@@ -1,151 +1,116 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 class App extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 
 		$this->load->model('CRUDModel', 'crud');
+		$this->load->model('AdminModel', 'admin');
+
+		$this->session->set_userdata('NIP', '2001801');
+	}
+
+	// helper function
+	public function set_respon($isi_pesan, $success = false) {
+		if($success) {
+			$data = "<div class='alert alert-success' role='alert'>" . $isi_pesan . "</div>";
+			$this->session->set_flashdata("pesan", $data);
+		} else {
+			$data = "<div class='alert alert-danger' role='alert'>" . $isi_pesan . "</div>";
+			$this->session->set_flashdata("pesan", $data);
+		}
 	}
 
 	// halaman dashboard
 	public function index() {
+		$data['matakuliah'] = $this->crud->get('matakuliah');
+
 		$this->load->view('templates/header');
 		$this->load->view('templates/navbar');
 		$this->load->view('templates/sidebar');
-		$this->load->view('app/dashboard');
+		$this->load->view('app/dashboard', $data);
 		$this->load->view('templates/footer');
 	}
 
-	// member area
-	public function register_member () {
+	// kelas area
+	public function kelas($aksi = NULL, $id = NULL) {
+		if(!$aksi or $aksi == 'detail') {
+			$NIP = $this->session->userdata('NIP');
 
-		$this->form_validation->set_rules('NIK', 'NIK', 'required');
-		$this->form_validation->set_rules('nama', 'Nama', 'required');
-		$this->form_validation->set_rules('tempat_lahir', 'tempat_lahir', 'required');
-		$this->form_validation->set_rules('tanggal_lahir', 'tanggal_lahir', 'required');
-		$this->form_validation->set_rules('jenis_kelamin', 'jenis_kelamin', 'required');
-		$this->form_validation->set_rules('agama', 'agama', 'required');
-		$this->form_validation->set_rules('pekerjaan', 'pekerjaan', 'required');
-		$this->form_validation->set_rules('alamat', 'alamat', 'required');
-		$this->form_validation->set_rules('no_telp', 'no_telp', 'required');
+			$data['kelas'] = [];
+			if(!$id && $aksi == 'detail')
+				$data['kelas'] = $this->admin->getKelas($NIP);
+			else
+				$data['kelas'] = $this->admin->getKelas($NIP, $id);
 
-
-		if($this->form_validation->run() == FALSE) {
-
-			$id_terakhir = $this->crud->get_last('members');
-
-			if($id_terakhir) {
-				$data['ID'] = $id_terakhir['ID'] + 1;
-			} else {
-				$data['ID'] = 1;
-			}
+			$data['matakuliah'] = $this->crud->get('matakuliah');
 
 			$this->load->view('templates/header');
 			$this->load->view('templates/navbar');
 			$this->load->view('templates/sidebar');
-			$this->load->view('app/member/registrasi', $data);
+			$this->load->view('app/kelas/index', $data);
 			$this->load->view('templates/footer');
 		} else {
-			$data = $this->input->post();
+			switch($aksi) {
+				case 'add':
+					$kelas = [
+						'Id_kelas' => 'KL' . random_string('numeric', 3),
+						'Id_matkul' => $this->input->post('Id_matkul'),
+						'NIP' => $this->session->userdata('NIP')
+					];
+					
+					$sukses = $this->crud->insert('kelas', $kelas);
 
-			$data['created_at'] = date('Y-m-d H:i:s');
-			$data['updated_at'] = date('Y-m-d H:i:s');
+					$jadwal = [
+						'Id_jadwal' => 'JD'.random_string('numeric', 3),
+						'Hari' => $this->input->post('hari'),
+						'Jam' => $this->input->post('jam_mulai'),
+						'Id_kelas' => $kelas['Id_kelas']
+					];
 
-			if($this->crud->insert($data, 'members')) {
-				$this->session->set_flashdata('pesan', '<div class="alert alert-success" role="alert">Data berhasil ditambahkan</div>');
-			} else {
-				$this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">Data gagal ditambahkan</div>');
+					if($sukses && $this->crud->insert('jadwal', $jadwal)) {
+						$this->set_respon('Kelas berhasil ditambahkan', true);
+					} else {
+						$this->set_respon('Kelas gagal ditambahkan', false);
+					}
+
+				break;
+				// =========================================================
+				case 'edit':
+					$data = [
+						'Id_matkul' => $this->input->post('Id_matkul'),
+						'NIP' => $this->session->userdata('NIP')
+					];
+
+					$id = $this->input->post('Id_kelas');
+
+					if($this->admin->updateKelas($data, $id)) {
+						$this->set_respon('Kelas berhasil diperbaharui', true);
+					} else {
+						$this->set_respon('Kelas gagal diperbaharui', false);
+					}
+				break;
+				// =========================================================
+				case 'delete':
+					$id = $this->input->post('Id_kelas');
+
+					if($this->admin->delete('kelas', $id)) {
+						$this->set_respon('Kelas berhasil dihapus', true);
+					} else {
+						$this->set_respon('Kelas gagal dihapus', false);
+					}
+				break;
+				// =========================================================
+				default:
+					$this->set_respon('Tidak ada method ' . $aksi, false);
 			}
 
-			redirect('app/members');
-		}
-
-	}
-
-	public function users ($aksi = NULL, $id = NULL) {
-
-		if($aksi == 'add') {
-			$data = $this->input->post();
-			$data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-
-			if($this->crud->insert($data, 'users')) {
-				$this->session->set_flashdata('pesan', '<div class="alert alert-success" role="alert">Data berhasil disimpan</div>');
-			} else {
-				$this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">Data gagal disimpan</div>');
-			}
-
-			redirect('App/users');
-
-		} else if ($aksi == 'aktivasi') {
-			if($this->crud->activation($id)) {
-				$this->session->set_flashdata('pesan', '<div class="alert alert-success" role="alert">Status akun berhasil diubah</div>');
-			} else {
-				$this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">Status akun gagal diubah</div>');
-			}
-
-			redirect('App/users');
-		} else {
-			$data['users'] = $this->crud->get('users');
-
-			$this->load->view('templates/header');
-			$this->load->view('templates/navbar');
-			$this->load->view('templates/sidebar');
-			$this->load->view('app/member/users', $data);
-			$this->load->view('templates/footer');
-		}
-
-	}
-
-	public function members ($aksi = NULL, $id = NULL) {
-		if($aksi == "delete") {
-
-			$id = $this->input->post('id');
-			
-			if($this->crud->delete('members', $id)) {
-				$this->session->set_flashdata('pesan', '<div class="alert alert-success" role="alert">Member berhasil menghapus.</div>');
-			} else {
-				$this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">Member gagal menghapus.</div>');
-			}
-
-			redirect('App/members');
-
-		} else if($aksi == "edit") {
-
-		} else {
-			$data['members'] = $this->crud->get('members');
-
-			$this->load->view('templates/header');
-			$this->load->view('templates/navbar');
-			$this->load->view('templates/sidebar');
-			$this->load->view('app/member/members', $data);
-			$this->load->view('templates/footer');
+			redirect('App/kelas');
 		}
 	}
 
-	// transaksi area
-	public function simpan() {
-		$this->load->view('templates/header');
-		$this->load->view('templates/navbar');
-		$this->load->view('templates/sidebar');
-		$this->load->view('app/transaksi/simpan');
-		$this->load->view('templates/footer');
-	}
-
-	public function pinjam() {
-		$this->load->view('templates/header');
-		$this->load->view('templates/navbar');
-		$this->load->view('templates/sidebar');
-		$this->load->view('app/transaksi/pinjam');
-		$this->load->view('templates/footer');
-	}
-
-	public function withdraw() {
-
-	}
-
-	public function angsuran() {
-
-	}
+	// presensi area
 
 	// lainnya untuk kebutuhan API
 	public function get_data($table, $id = NULL) {

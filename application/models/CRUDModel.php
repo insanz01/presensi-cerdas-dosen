@@ -1,4 +1,5 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 class CRUDModel extends CI_Model {
 
@@ -8,9 +9,9 @@ class CRUDModel extends CI_Model {
 		return $this->db->query($query)->row_array();
 	}
 	
-	public function insert($data, $table) {
-		$data['created_at'] = date('Y-m-d H:i:s', time());
-		$data['updated_at'] = date('Y-m-d H:i:s', time());
+	public function insert($table, $data) {
+		// $data['created_at'] = date('Y-m-d H:i:s', time());
+		// $data['updated_at'] = date('Y-m-d H:i:s', time());
 
 		return $this->db->insert($table, $data);
 	}
@@ -23,8 +24,8 @@ class CRUDModel extends CI_Model {
 		}
 	}
 
-	public function update($data, $table, $id) {
-		$data['updated_at'] = date('Y-m-d H:i:s', time());
+	public function update($table, $data, $id) {
+		// $data['updated_at'] = date('Y-m-d H:i:s', time());
 
 		$this->db->set($data);
 		$this->db->where('ID', $id);
