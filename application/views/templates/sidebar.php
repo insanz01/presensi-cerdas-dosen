@@ -4,7 +4,7 @@
     <a href="<?= base_url('app/index') ?>" class="brand-link">
       <img src="<?= base_url() ?>assets/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
            style="opacity: .8">
-      <span class="brand-text font-weight-light">KOPERASI</span>
+      <span class="brand-text font-weight-light">Presensi</span>
     </a>
 
     <!-- Sidebar -->
@@ -15,7 +15,7 @@
           <img src="<?= base_url() ?>assets/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Admin Pusat</a>
+          <a href="#" class="d-block">Nama Dosen</a>
         </div>
       </div>
 
@@ -24,7 +24,7 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-               <!-- tambah class menu-open untuk secara otomatis membuka -->
+         <!-- tambah class menu-open untuk secara otomatis membuka -->
           <li class="nav-item">
             <a href="<?= base_url('app/index') ?>" class="nav-link">
               <i class="nav-icon fas fa-home"></i>
@@ -46,7 +46,16 @@
             </a>
           </li>
 
-          <li class="nav-header">AKSI</li>
+          <li class="nav-item">
+            <a href="<?= base_url('app/presensi') ?>" class="nav-link">
+              <i class="nav-icon far fa-calendar"></i>
+              <p>
+                Presensi
+              </p>
+            </a>
+          </li>
+
+          <!-- <li class="nav-header">AKSI</li> -->
            <!-- tambah class menu-open untuk secara otomatis membuka -->  	
           <!-- <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
@@ -83,6 +92,7 @@
               </li>
             </ul>
           </li> -->
+          
 
           <li class="nav-header">LABELS</li>
           <li class="nav-item">

@@ -24,7 +24,8 @@ class App extends CI_Controller {
 
 	// halaman dashboard
 	public function index() {
-		$data['matakuliah'] = $this->crud->get('matakuliah');
+		$NIP = $this->session->userdata('NIP');
+		$data['kelas'] = $this->admin->getKelas($NIP);
 
 		$this->load->view('templates/header');
 		$this->load->view('templates/navbar');
@@ -111,10 +112,96 @@ class App extends CI_Controller {
 	}
 
 	// presensi area
+	public function presensi($aksi = NULL, $id = NULL) {
+		if(!$aksi or $aksi == 'detail') {
+			$NIP = $this->session->userdata('NIP');
+
+			$data['kelas'] = [];
+			if(!$id && $aksi == 'detail')
+				$data['kelas'] = $this->admin->getKelas($NIP);
+			else
+				$data['kelas'] = $this->admin->getKelas($NIP, $id);
+
+			$this->load->view('templates/header');
+			$this->load->view('templates/navbar');
+			$this->load->view('templates/sidebar');
+			$this->load->view('app/presensi/index', $data);
+			$this->load->view('templates/footer');
+		} else {
+			switch($aksi) {
+				case 'add':
+					$kelas = [
+						'Id_kelas' => 'KL' . random_string('numeric', 3),
+						'Id_matkul' => $this->input->post('Id_matkul'),
+						'NIP' => $this->session->userdata('NIP')
+					];
+					
+					$sukses = $this->crud->insert('kelas', $kelas);
+
+					$jadwal = [
+						'Id_jadwal' => 'JD'.random_string('numeric', 3),
+						'Hari' => $this->input->post('hari'),
+						'Jam' => $this->input->post('jam_mulai'),
+						'Id_kelas' => $kelas['Id_kelas']
+					];
+
+					if($sukses && $this->crud->insert('jadwal', $jadwal)) {
+						$this->set_respon('Kelas berhasil ditambahkan', true);
+					} else {
+						$this->set_respon('Kelas gagal ditambahkan', false);
+					}
+
+				break;
+				// =========================================================
+				case 'edit':
+					$data = [
+						'Id_matkul' => $this->input->post('Id_matkul'),
+						'NIP' => $this->session->userdata('NIP')
+					];
+
+					$id = $this->input->post('Id_kelas');
+
+					if($this->admin->updateKelas($data, $id)) {
+						$this->set_respon('Kelas berhasil diperbaharui', true);
+					} else {
+						$this->set_respon('Kelas gagal diperbaharui', false);
+					}
+				break;
+				// =========================================================
+				case 'delete':
+					$id = $this->input->post('Id_kelas');
+
+					if($this->admin->delete('kelas', $id)) {
+						$this->set_respon('Kelas berhasil dihapus', true);
+					} else {
+						$this->set_respon('Kelas gagal dihapus', false);
+					}
+				break;
+				// =========================================================
+				default:
+					$this->set_respon('Tidak ada method ' . $aksi, false);
+			}
+
+			redirect('App/presensi');
+		}
+	}
 
 	// lainnya untuk kebutuhan API
 	public function get_data($table, $id = NULL) {
-		$data = $this->crud->get($table, $id);
+		$primary_key = '';
+
+		switch($table){
+			case 'presensi':
+				$primary_key = "Id_presensi";
+			break;
+			#===================================
+			case 'jadwal':
+				$primary_key = "Id_jadwal";
+			break;
+			#===================================
+		}
+
+		$data = $this->crud->get($table, $primary_key, $id);
 
 		echo json_encode($data, JSON_PRETTY_PRINT);
 	}
