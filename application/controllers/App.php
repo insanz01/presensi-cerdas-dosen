@@ -186,6 +186,31 @@ class App extends CI_Controller {
 		}
 	}
 
+	public function kunci() {
+
+		$this->form_validation->set_rules('kunci', 'Kunci', 'required');
+
+		if($this->form_validation->run() === FALSE) {
+			$data['kunci'] = $this->admin->get_key();
+
+			$this->load->view('templates/header');
+			$this->load->view('templates/navbar');
+			$this->load->view('templates/sidebar');
+			$this->load->view('app/kunci/index', $data);
+			$this->load->view('templates/footer');
+		} else {
+			$kunci = $this->input->post('kunci');
+
+			if($this->admin->set_key($kunci)) {
+				$this->session->set_flashdata('pesan', '<div class="alert alert-success" role="alert">Kunci Enkripsi telah diperbaharui</div>');
+			} else {
+				$this->session->set_flashdata('pesan', '<div class="alert alert-danger" role="alert">Kunci Enkripsi gagal diperbaharui</div>');
+			}
+
+			redirect('app/kunci');
+		}
+	}
+
 	// lainnya untuk kebutuhan API
 	public function get_data($table, $id = NULL) {
 		$primary_key = '';

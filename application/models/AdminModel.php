@@ -49,6 +49,36 @@ class AdminModel extends CI_Model {
 
 			return $this->db->query($query)->result_array();
 		}
+	}
 
+	public function get_key() {
+		$data = $this->db->get_where('kunci', ['id' => 1])->row_array();
+
+		if($data) {
+			return $data['kunci'];
+		}
+
+		return '';
+	}
+
+	public function set_key($kunci) {
+		$data = $this->db->get('kunci')->result_array();
+
+		if($data) {
+			$this->db->set('kunci', $kunci);
+			$this->db->where('id', 1);
+			$this->db->update('kunci');
+
+			return $this->db->affected_rows();
+		} else {
+			$new_data = [
+				'id' => NULL,
+				'kunci' => $kunci,
+				'created_at' => date('Y-m-d', time()),
+				'updated_at' => date('Y-m-d', time())
+			];
+
+			return $this->db->insert('kunci', $new_data);
+		}
 	}
 }

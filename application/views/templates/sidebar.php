@@ -15,7 +15,7 @@
           <img src="<?= base_url() ?>assets/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Nama Dosen</a>
+          <a href="#" class="d-block">App Dosen</a>
         </div>
       </div>
 
@@ -51,6 +51,15 @@
               <i class="nav-icon far fa-calendar"></i>
               <p>
                 Presensi
+              </p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="<?= base_url('app/kunci') ?>" class="nav-link">
+              <i class="nav-icon fas fa-poop"></i>
+              <p>
+                Kunci Enkripsi
               </p>
             </a>
           </li>
