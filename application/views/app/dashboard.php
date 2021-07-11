@@ -86,7 +86,6 @@
 
         </div>
 
-        
       </div>
     </section> -->
 
@@ -97,6 +96,10 @@
             <div class="card">
               <div class="card-body">
                 <div class="row">
+                  <div class="col-12">
+                    <h3 id="nama_kelas"></h3>
+                    <p id="nomor_pertemuan"></p>
+                  </div>
                   <div class="col-7 text-center">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" id="qr_target" width="400px" height="400px">
                   </div>
@@ -121,7 +124,7 @@
                   <select class="form-control" id="matakuliah" name="matakuliah" onchange="pilihMatkul(this)">
                     <option value="">BELUM DIPILIH</option>
                     <?php foreach($kelas as $k): ?>
-                      <option value="<?= $k['Id_jadwal'] ?>"><?= $k['nama_matkul'] ?></option>
+                      <option value="<?= $k['Id_jadwal'] ?>-<?= $k['nama_matkul'] ?>"><?= $k['nama_matkul'] ?></option>
                     <?php endforeach; ?>
                   </select>
                 </div>
@@ -150,15 +153,23 @@
     let length_of_presensi = 0;
 
     const getPertemuanData = async (id_jadwal) => {
-      return await axios.get('http://localhost/presensi-cerdas/app/get_data/presensi/'+id_jadwal).then(res => res.data);
+      return await axios.get('http://<?= base_url() ?>/app/get_data/presensi/'+id_jadwal).then(res => res.data);
     }
 
     const pilihMatkul = (x) => {
       console.log(x.value);
       
       if(x.value !== '') {
-        let id_jadwal = x.value
+        let data_jadwal = x.value
+
+        data_jadwal = data_jadwal.split('-');
+
+        const id_jadwal = data_jadwal[0];
+        const nama_jadwal = data_jadwal[1];
+
         dapatkanPertemuan(id_jadwal);
+
+        document.getElementById('nama_kelas').innerHTML = `Kelas ${nama_jadwal}`;
       } else {
         const pertemuan = document.getElementById('pertemuan');
         pertemuan.innerHTML = '';
@@ -201,6 +212,8 @@
       console.log(pertemuan)
 
       GLOBAL_PERTEMUAN = pertemuan;
+
+      document.getElementById('nomor_pertemuan').innerHTML = `Pertemuan ke-${pertemuan}`;
 
       let result = await createPresensi(GLOBAL_ID, pertemuan).then(res => res)
 
