@@ -91,16 +91,18 @@ class App extends CI_Controller {
 					} else {
 						$this->set_respon('Kelas gagal diperbaharui', false);
 					}
+
 				break;
 				// =========================================================
 				case 'delete':
 					$id = $this->input->post('Id_kelas');
 
-					if($this->admin->delete('kelas', $id)) {
+					if($this->admin->deleteJadwalKelas($id)) {
 						$this->set_respon('Kelas berhasil dihapus', true);
 					} else {
 						$this->set_respon('Kelas gagal dihapus', false);
 					}
+					
 				break;
 				// =========================================================
 				default:

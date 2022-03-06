@@ -17,7 +17,7 @@
 			<div class="col-4 mt-2">
 				<div class="form-group">
 					<label>Pertemuan</label>
-					<select id="pertemuan" class="form-control"></select>
+					<select id="pertemuan" class="form-control" onclick="pilihPertemuan(this)"></select>
 				</div>
 			</div>
 
@@ -70,18 +70,25 @@
 
   	let result = await getData(GLOBAL_JADWAL, pertemuan).then(res => res);
 
-  	console.log(pertemuan);
+  	console.log(result);
 
   	let temp = '';
 
-  	result.forEach((res, nomor) => {
+  	if(!result.length) {
   		temp += `<tr>
-  			<td>${nomor + 1}</td>
-  			<td>${res.NIM}</td>
-  			<td>${res.Nama}</td>
-  			<td>${res.Tanggal_jam_presensi}</td>
-  		</tr>`;
-  	})
+  								<td colspan="4" class="text-center">Tidak ada data presensi.</td>
+  						</tr>`;
+  	} else {
+	  	result.forEach((res, nomor) => {
+	  		temp += `<tr>
+	  			<td>${nomor + 1}</td>
+	  			<td>${res.NIM}</td>
+	  			<td>${res.Nama}</td>
+	  			<td>${res.Tanggal_jam_presensi}</td>
+	  		</tr>`;
+	  	});
+  	}
+
 
   	mahasiswa.innerHTML = temp;
   }
@@ -94,7 +101,7 @@
     let temp = '<option value="">BELUM DIPILIH</option>';
 
     list_pertemuan.forEach((pertemuan_ke) => {
-      temp += `<option onchange="pilihPertemuan(this)" value="${pertemuan_ke}">Pertemuan ${pertemuan_ke}</option>`;
+      temp += `<option value="${pertemuan_ke}">Pertemuan ${pertemuan_ke}</option>`;
     })
 
     pertemuan.innerHTML = temp;

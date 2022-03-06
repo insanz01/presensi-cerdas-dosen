@@ -101,7 +101,7 @@
                     <p id="nomor_pertemuan"></p>
                   </div>
                   <div class="col-7 text-center">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" id="qr_target" width="400px" height="400px">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" id="qr_target" width="400px" height="400px" alt="">
                   </div>
                   <div class="col-5">
                     <h3 class="ml-2"><?= date('d M Y', time()) ?></h3>
@@ -153,10 +153,10 @@
     let length_of_presensi = 0;
 
     const getPertemuanData = async (id_jadwal) => {
-      return await axios.get('http://<?= base_url() ?>/app/get_data/presensi/'+id_jadwal).then(res => res.data);
+      return await axios.get('<?= base_url() ?>app/get_data/presensi/'+id_jadwal).then(res => res.data);
     }
 
-    const pilihMatkul = (x) => {
+    const pilihMatkul = async (x) => {
       console.log(x.value);
       
       if(x.value !== '') {
@@ -167,7 +167,7 @@
         const id_jadwal = data_jadwal[0];
         const nama_jadwal = data_jadwal[1];
 
-        dapatkanPertemuan(id_jadwal);
+        await dapatkanPertemuan(id_jadwal);
 
         document.getElementById('nama_kelas').innerHTML = `Kelas ${nama_jadwal}`;
       } else {
@@ -227,9 +227,18 @@
 
       const list_pertemuan = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
-      let result = await getPertemuanData(id_jadwal).then(res => res);
+      let temp = '';
+      console.log('sejauh ini berjalan');
 
+      list_pertemuan.forEach((pertemuan_ke) => {
+        temp += `<div class="btn btn-primary btn-block my-2" onclick="pilihPertemuan(${pertemuan_ke})">Pertemuan ${pertemuan_ke}</div>`;
+      })
+
+      pertemuan.innerHTML = temp;
+      
       GLOBAL_ID = id_jadwal;
+
+      let result = await getPertemuanData(id_jadwal).then(res => res);
 
       console.log(result)
 
@@ -237,13 +246,6 @@
         console.log('sudah berjalan')
       }
 
-      let temp = '';
-
-      list_pertemuan.forEach((pertemuan_ke) => {
-        temp += `<div class="btn btn-primary btn-block my-2" onclick="pilihPertemuan(${pertemuan_ke})">Pertemuan ${pertemuan_ke}</div>`;
-      })
-
-      pertemuan.innerHTML = temp;
     }
 
     window.addEventListener('load', () => {
