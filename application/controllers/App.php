@@ -79,12 +79,16 @@ class App extends CI_Controller {
 				break;
 				// =========================================================
 				case 'edit':
+					// $data = [
+					// 	'Id_matkul' => $this->input->post('Id_matkul'),
+					// 	'NIP' => $this->session->userdata('NIP')
+					// ];
 					$data = [
-						'Id_matkul' => $this->input->post('Id_matkul'),
-						'NIP' => $this->session->userdata('NIP')
+						'Hari' => $this->input->post('hari'),
+						'Jam' => $this->input->post('jam_mulai')
 					];
 
-					$id = $this->input->post('Id_kelas');
+					$id = $this->input->post('Id_jadwal');
 
 					if($this->admin->updateKelas($data, $id)) {
 						$this->set_respon('Kelas berhasil diperbaharui', true);
@@ -102,7 +106,7 @@ class App extends CI_Controller {
 					} else {
 						$this->set_respon('Kelas gagal dihapus', false);
 					}
-					
+
 				break;
 				// =========================================================
 				default:

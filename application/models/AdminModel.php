@@ -109,5 +109,15 @@ class AdminModel extends CI_Model
 		if($this->db->delete('jadwal', ['Id_kelas' => $id_kelas])) {
 			return $this->db->delete('kelas', ['Id_kelas' => $id_kelas]);
 		}
+
+		return false;
 	}
+
+	public function updateKelas($data, $id) {
+		$this->db->set($data);
+		$this->db->where('Id_jadwal', $id);
+		$this->db->update('jadwal');
+
+		return $this->db->affected_rows();
+	} 
 }

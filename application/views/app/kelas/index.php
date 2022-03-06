@@ -16,7 +16,7 @@
 							<p><?= $k['Jam'] ?></p>
 							<div class="row">
 								<div class="col-12">
-									<button class="btn btn-primary btn-block" data-toggle="modal" data-target="#editModal" onclick="showData(this)" id-kelas="<?= $k['Id_jadwal'] ?>">EDIT</button>
+									<button class="btn btn-primary btn-block" data-toggle="modal" data-target="#editModal" onclick="showData(this)" id-jadwal="<?= $k['Id_jadwal'] ?>">EDIT</button>
 								</div>
 								<div class="col-12 text-center">
 									<a href="#" class="text-sm text-danger" data-toggle="modal" data-target="#deleteModal" onclick="deleteData(this)" id-kelas="<?= $k['Id_kelas'] ?>">DELETE</a>
@@ -117,9 +117,10 @@
       </div>
       <form action="<?= base_url('App/kelas/edit') ?>" method="POST">
       	<div class="modal-body">
+      		<input type="hidden" name="Id_jadwal" id="edit_jadwal">
 	        <div class="form-group">
 	        	<label>Matakuliah</label>
-	        	<select class="form-control" name="Id_matkul" id="edit_matkul" required>
+	        	<select class="form-control" name="Id_matkul" id="edit_matkul" required readonly>
 	        		<?php foreach($matakuliah as $m): ?>
 		        		<option value="<?= $m['Id_matkul'] ?>"><?= $m['Nama'] ?></option>
 		        	<?php endforeach; ?>
@@ -162,12 +163,13 @@
 	}
 
 	const showData = async (target) => {
-		const id = target.getAttribute('id-kelas');
+		const id = target.getAttribute('id-jadwal');
 		const result = await getData(id).then(res => res);
 
 		console.log(result)
 		console.log(result.Id_matkul)
 
+		document.getElementById('edit_jadwal').value = id;
 		document.getElementById('edit_matkul').value = result.Id_matkul;
 		document.getElementById('edit_hari').value = result.Hari;
 		document.getElementById('edit_jam').value = result.Jam;
