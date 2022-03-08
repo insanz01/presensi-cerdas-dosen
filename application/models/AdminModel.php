@@ -57,7 +57,7 @@ class AdminModel extends CI_Model
 	public function getPresent($table, $id, $pertemuan)
 	{
 		if ($table == 'presensi') {
-			$hasPresent = $this->db->get_where('pertemuan', ['Id_jadwal' => $id, 'Pertamuan' => $pertemuan])->row_array();
+			$hasPresent = $this->db->get_where('pertemuan', ['Id_jadwal' => $id, 'Pertemuan' => $pertemuan])->row_array();
 
 			if($hasPresent) {
 				return true;
